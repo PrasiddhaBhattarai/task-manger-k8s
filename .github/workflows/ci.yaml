@@ -35,11 +35,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # - name: login to Docker Hub
-      #   uses: docker/login-action@v3
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
         
       - name: Build and Push ${{ matrix.name }}
         uses: docker/build-push-action@v6
@@ -48,7 +48,7 @@ jobs:
           file: ${{ matrix.dockerfile }}
           platforms: linux/amd64,linux/arm64
           push: false
-          tags: ${{ matrix.image }}:latest
-          # tags: |
-            # ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}:latest
-            # ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}:${{ github.run_number }}
+          # tags: ${{ matrix.image }}:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}:${{ github.run_number }}
