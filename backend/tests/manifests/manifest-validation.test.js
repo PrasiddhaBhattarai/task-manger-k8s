@@ -13,7 +13,7 @@ const manifestFiles = [
   'postgres-deployment.yaml',
   'postgres-service.yaml',
   'backend-hpa.yaml',
-  'storage.yaml',
+  'postgres-pvc.yaml',
 ];
 
 /**
@@ -194,25 +194,39 @@ describe('HPA configuration', () => {
   });
 });
 
+// describe('Storage configuration', () => {
+//   const pvs = findDocsByKind('PersistentVolume');
+//   const pvcs = findDocsByKind('PersistentVolumeClaim');
+
+//   it('PV has correct configuration', () => {
+//     expect(pvs.length).toBe(1);
+//     const pv = pvs[0].doc;
+
+//     expect(pv.spec.capacity.storage).toBe('1Gi');
+//     expect(pv.spec.accessModes).toContain('ReadWriteOnce');
+//     expect(pv.spec.hostPath).toBeDefined();
+//   });
+
+//   it('PVC matches PV storageClassName', () => {
+//     expect(pvcs.length).toBe(1);
+//     const pv = pvs[0].doc;
+//     const pvc = pvcs[0].doc;
+
+//     expect(pvc.spec.storageClassName).toBe(pv.spec.storageClassName);
+//     expect(pvc.spec.accessModes).toContain('ReadWriteOnce');
+//   });
+// });
+
 describe('Storage configuration', () => {
-  const pvs = findDocsByKind('PersistentVolume');
   const pvcs = findDocsByKind('PersistentVolumeClaim');
 
-  it('PV has correct configuration', () => {
-    expect(pvs.length).toBe(1);
-    const pv = pvs[0].doc;
-
-    expect(pv.spec.capacity.storage).toBe('1Gi');
-    expect(pv.spec.accessModes).toContain('ReadWriteOnce');
-    expect(pv.spec.hostPath).toBeDefined();
-  });
-
-  it('PVC matches PV storageClassName', () => {
+  it('PVC has correct configuration', () => {
     expect(pvcs.length).toBe(1);
-    const pv = pvs[0].doc;
+
     const pvc = pvcs[0].doc;
 
-    expect(pvc.spec.storageClassName).toBe(pv.spec.storageClassName);
+    expect(pvc.spec.storageClassName).toBe('local-path');
+    expect(pvc.spec.resources.requests.storage).toBe('1Gi');
     expect(pvc.spec.accessModes).toContain('ReadWriteOnce');
   });
 });
