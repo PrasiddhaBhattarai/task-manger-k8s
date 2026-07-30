@@ -30,6 +30,7 @@ function asyncHandler(fn) {
     try {
       await fn(req, res, next);
     } catch (err) {
+      console.error('Database error:', err);
       // pg connection errors or query errors when DB is unavailable
       res.status(503).json({ error: 'Database unavailable' });
     }
