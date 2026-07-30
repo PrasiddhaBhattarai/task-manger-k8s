@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: workshop
+    component: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: workshop
+      component: backend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        
+      maxUnavailable: 0  
+  template:
+    metadata:
+      labels:
+        app: workshop
+        component: backend
+    spec:
+      containers:
+        - name: backend
+          image: prashidha333/workshop-backend:latest
+          #imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: DB_HOST
+              value: postgres-service
+            - name: DB_PORT
+              value: "5432"
+            # Add remaining env vars: DB_NAME, DB_USER, DB_PASSWORD, PORT
+            - name: DB_NAME
+              value: task_db
+            - name: DB_USER
+              value: root
+            - name: DB_PASSWORD
+              value: root
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '128Mi'
+            limits:
+              cpu: '500m'
+              memory: '256Mi'
