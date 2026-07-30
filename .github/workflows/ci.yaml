@@ -1,4 +1,4 @@
-name: Matrix strategy Docker build and push pipeline
+name: Task Manager CI
 
 on:
   push:
@@ -8,7 +8,54 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-push:
+
+  unit-property-tests:
+    name: Backend unit & property tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit & property tests
+        run: npm run test
+
+  manifest-validation-test:
+    name: Validate k8s manifests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run manifest validation tests
+        run: npm run test:manifests
+
+  build-and-push-docker-images:
     runs-on: ubuntu-latest
 
     strategy:
