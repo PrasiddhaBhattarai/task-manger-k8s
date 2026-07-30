@@ -45,10 +45,10 @@ describe('K8s Manifest YAML Parsing', () => {
   it.each(manifestFiles)('%s parses as valid YAML', (filename) => {
     const filePath = path.join(k8sDir, filename);
     expect(fs.existsSync(filePath)).toBe(true);
-    
+
     const docs = loadAllYamlDocs(filename);
     expect(docs.length).toBeGreaterThan(0);
-    
+
     for (const doc of docs) {
       expect(doc).toHaveProperty('apiVersion');
       expect(doc).toHaveProperty('kind');
@@ -133,10 +133,27 @@ describe('Service name and DNS hostname consistency', () => {
 
     expect(backendUrl).toBeDefined();
     // Extract hostname from URL (e.g., "http://backend-service:3000" → "backend-service")
+    // const urlMatch = backendUrl.match(/\/\/([^:\/]+)/);
+    // expect(urlMatch).not.toBeNull();
+    // const hostname = urlMatch[1];
+    // expect(serviceNames).toContain(hostname);
+
+    
+    // Extract hostname from URL (supports both:
+    // http://backend-service:3000
+    // http://backend-service.default.svc.cluster.local:3000)
     const urlMatch = backendUrl.match(/\/\/([^:\/]+)/);
     expect(urlMatch).not.toBeNull();
+
     const hostname = urlMatch[1];
-    expect(serviceNames).toContain(hostname);
+
+    // Accept short service names and Kubernetes DNS names
+    // Example:
+    // backend-service                     ✅
+    // backend-service.default.svc.cluster.local ✅
+    const serviceName = hostname.split('.')[0];
+
+    expect(serviceNames).toContain(serviceName);
   });
 });
 
