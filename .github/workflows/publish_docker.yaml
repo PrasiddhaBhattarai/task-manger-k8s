@@ -40,8 +40,17 @@ jobs:
 
       - name: Check secrets
         run: |
-          echo "Username exists: ${{ secrets.DOCKERHUB_USERNAME != '' }}"
-          echo "Token exists: ${{ secrets.DOCKERHUB_TOKEN != '' }}"
+          if [ -n "${{ secrets.DOCKERHUB_USERNAME }}" ]; then
+            echo "DOCKERHUB_USERNAME: present"
+          else
+            echo "DOCKERHUB_USERNAME: missing"
+          fi
+
+          if [ -n "${{ secrets.DOCKERHUB_TOKEN }}" ]; then
+            echo "DOCKERHUB_TOKEN: present"
+          else
+            echo "DOCKERHUB_TOKEN: missing"
+          fi
      
       - name: login to Docker Hub
         uses: docker/login-action@v3
