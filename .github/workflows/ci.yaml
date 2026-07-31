@@ -55,9 +55,9 @@ jobs:
       - name: Run manifest validation tests
         run: npm run test:manifests
 
-  build-and-push-docker-images:
+  build-docker-images:
     runs-on: ubuntu-latest
-
+    needs: [unit-property-tests, manifest-validation-test]
     strategy:
       matrix:
         # Use include to add custom configurations.
@@ -76,17 +76,17 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: login to Docker Hub
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
         
       - name: Build and Push ${{ matrix.name }}
         uses: docker/build-push-action@v6
@@ -94,7 +94,7 @@ jobs:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
           platforms: linux/amd64,linux/arm64
-          push: true
+          push: false
           # tags: ${{ matrix.image }}:latest
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}:latest
