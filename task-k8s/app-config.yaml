@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: myapp
+data:
+  APP_VERSION: "1.0.0"
+  LOG_LEVEL: "INFO"
+  DB_HOST: "postgres-service"
+  DB_NAME: "task_db"
+  DB_PORT: "5432"
+  BACKEND_URL: "http://backend-service.default.svc.cluster.local:3000"

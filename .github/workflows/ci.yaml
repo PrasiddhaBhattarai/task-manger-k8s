@@ -82,19 +82,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Check secrets
-        run: |
-          if [ -n "${{ secrets.DOCKERHUB_USERNAME }}" ]; then
-            echo "DOCKERHUB_USERNAME: present"
-          else
-            echo "DOCKERHUB_USERNAME: missing"
-          fi
+      # - name: Check secrets
+      #   run: |
+      #     if [ -n "${{ secrets.DOCKERHUB_USERNAME }}" ]; then
+      #       echo "DOCKERHUB_USERNAME: present"
+      #     else
+      #       echo "DOCKERHUB_USERNAME: missing"
+      #     fi
 
-          if [ -n "${{ secrets.DOCKERHUB_TOKEN }}" ]; then
-            echo "DOCKERHUB_TOKEN: present"
-          else
-            echo "DOCKERHUB_TOKEN: missing"
-          fi
+      #     if [ -n "${{ secrets.DOCKERHUB_TOKEN }}" ]; then
+      #       echo "DOCKERHUB_TOKEN: present"
+      #     else
+      #       echo "DOCKERHUB_TOKEN: missing"
+      #     fi
 
       # - name: login to Docker Hub
       #   uses: docker/login-action@v3
@@ -102,7 +102,7 @@ jobs:
       #     username: ${{ secrets.DOCKERHUB_USERNAME }}
       #     password: ${{ secrets.DOCKERHUB_TOKEN }}
         
-      - name: Build and Push ${{ matrix.name }}
+      - name: Build ${{ matrix.name }}
         uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.context }}

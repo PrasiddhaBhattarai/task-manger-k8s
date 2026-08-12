@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: myapp
+  annotations:
+    kubernetes.io/change-cause: "Updated backend image to latest"
+  labels:
+    app: task
+    component: backend
+
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  selector:
+    matchLabels:
+      app: task
+      component: backend
+
+  template:
+    metadata:
+      labels:
+        app: task
+        component: backend
+
+    spec:
+      containers:
+        - name: backend
+          image: prashidha333/workshop-backend:latest
+
+          ports:
+            - containerPort: 3000
+              name: http
+
+          # env:
+          #   - name: DB_PASSWORD
+          #     valueFrom:
+          #       secretKeyRef:
+          #         name: db-secret            # Secret name
+          #         key: POSTGRES_PASSWORD     # Specific key inside
+
+          envFrom:
+            - configMapRef:
+                name: app-config       # inject all keys as env variables
+            - secretRef:
+                name: db-secret
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+            successThreshold: 1                   

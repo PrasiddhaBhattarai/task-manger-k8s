@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: myapp
+  labels:
+    app: task
+    component: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: task
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: task
+        component: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: prashidha333/workshop-frontend:latest
+          #imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+              name: http
+          env:
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: BACKEND_URL
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '128Mi'
+            limits:
+              cpu: '500m'
+              memory: '256Mi'

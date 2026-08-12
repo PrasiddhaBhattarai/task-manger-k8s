@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pod-status-logger
+  namespace: myapp
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          serviceAccountName: pod-status-logger
+          restartPolicy: OnFailure
+          containers:
+          - name: logger
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              echo "------------------------------------------------------------------------------------------"
+              echo "# Date in UTC:"
+              TZ="Asia/Kathmandu" date +"%Y-%m-%d %H:%M:%S"
+              echo "------------------------------------------------------------------------------------------"
+              echo
+              for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}'); do
+                echo "------------------------------------------------------------------------------------------"
+                echo "# Namespace: $ns"
+                echo "------------------------------------------------------------------------------------------"
+                echo "Pod count: $(kubectl get pods -n "$ns" --no-headers 2>/dev/null | wc -l)"
+                kubectl get pods -n "$ns"
+                echo
+              done
+              echo 
+              echo 
+              echo 
+              echo "=========================================================================================="
