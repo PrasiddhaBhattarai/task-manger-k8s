@@ -16,19 +16,40 @@ A hands-on Kubernetes workshop project featuring a full-stack CRUD application (
 │   ├── nginx.conf        Nginx config template (envsubst + resolver)
 │   ├── entrypoint.sh     Container startup script (env substitution)
 │   └── Dockerfile        Container image definition
-├── k8s/                  Kubernetes resource manifests
-│   ├── backend-deployment.yaml
-│   ├── backend-service.yaml
-│   ├── frontend-deployment.yaml
-│   ├── frontend-service.yaml
-│   ├── postgres-deployment.yaml
-│   ├── postgres-service.yaml
-│   ├── backend-hpa.yaml
-│   └── storage.yaml      (optional PV/PVC)
-├── build-and-deploy.sh   One-command build + deploy to K3s
-├── deploy.sh             Apply manifests only (images must exist)
-└── workshop.html         Interactive workshop page for participants
+├── k8s-cronJob/                     Kubernetes resource manifests
+│   ├── app-config.yaml              Application configuration
+│   ├── backend-deployment.yaml      
+│   ├── backend-hpa.yaml             
+│   ├── backend-service.yaml         
+│   ├── db-secret.yaml               Database credentials secret
+│   ├── frontend-deployment.yaml     
+│   ├── frontend-ingress.yaml        Frontend ingress
+│   ├── frontend-service.yaml        
+│   ├── postgres-deployment.yaml     
+│   ├── postgres-pvc.yaml            
+│   ├── postgres-service.yaml         
+│   └── cronjob/                     CronJob and logging resources
+│       ├── cronjob-rbac.yaml        RBAC configuration for CronJob
+│       ├── cronjob.yaml              Kubernetes CronJob
+│       ├── fluent-bit.yaml           Fluent Bit logging configuration
+│       └── loki.yaml                 Loki logging service
 ```
+
+## For cornJob
+- Apply all manifest
+- Port-forward Loki to your machine and query
+  - ```kubectl port-forward -n logging svc/loki 3100:3100```
+- Wait for cronjob to run (runs every 5 minutes)
+- You can manually run when testing
+  - ```kubectl create job --from=cronjob/pod-status-logger manual-test-1```
+- Apply followinng command to get log messages
+   ```bash
+    curl -s -G 'http://localhost:3100/loki/api/v1/query_range' \
+    --data-urlencode 'query={kubernetes_container_name="logger"}' \
+    --data-urlencode 'limit=5000' \
+    --data-urlencode 'direction=forward' \
+    | jq -r '.data.result[].values[] | .[1] | fromjson | .log // empty'
+    ```
 
 ## Prerequisites
 
