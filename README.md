@@ -2,6 +2,11 @@
 
 A hands-on Kubernetes workshop project featuring a full-stack CRUD application (Node.js Express backend, static HTML/Nginx frontend, PostgreSQL database), K3s-compatible Kubernetes manifests, and an interactive HTML workshop page that guides participants through creating Kubernetes resources.
 
+## k8s - cronJob
+- You can find manifests for cronJob in another branch:
+  <br>
+  ```feat/k8s-cronJob```
+
 ## Directory Structure
 
 ```
